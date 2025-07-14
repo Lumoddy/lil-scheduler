@@ -1,12 +1,11 @@
-
 type ColorHex = `#${string}`;
 
 export class Color
 {
     private static readonly _toColorPattern = new RegExp(
-    + "^(?:#?(?<r1>[0-9a-zA-Z])(?<g1>[0-9a-zA-Z])(?<b1>[0-9a-zA-Z])(?<a1>[0-9a-zA-Z])?)"
-    + "|(?:#?(?<r2>[0-9a-zA-Z]{2})(?<g2>[0-9a-zA-Z]{2})(?<b2>[0-9a-zA-Z]{2})(?<a2>[0-9a-zA-Z]{2})?)"
-    + "$");
+        + "^(?:#?(?<r1>[0-9a-zA-Z])(?<g1>[0-9a-zA-Z])(?<b1>[0-9a-zA-Z])(?<a1>[0-9a-zA-Z])?)"
+        + "|(?:#?(?<r2>[0-9a-zA-Z]{2})(?<g2>[0-9a-zA-Z]{2})(?<b2>[0-9a-zA-Z]{2})(?<a2>[0-9a-zA-Z]{2})?)"
+        + "$");
 
     public r: number;
     public g: number;
