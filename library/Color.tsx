@@ -1,11 +1,15 @@
-type ColorHex = `#${string}`;
+
+export type ColorHex = `#${string}`;
+
+export type Colorable =
+    | Color
+    | string
+    | [r: number, g: number, b: number, a?: number]
+    | { r: number, g: number, b: number, a?: number };
 
 export class Color
 {
-    private static readonly _toColorPattern = new RegExp(
-        + "^(?:#?(?<r1>[0-9a-zA-Z])(?<g1>[0-9a-zA-Z])(?<b1>[0-9a-zA-Z])(?<a1>[0-9a-zA-Z])?)"
-        + "|(?:#?(?<r2>[0-9a-zA-Z]{2})(?<g2>[0-9a-zA-Z]{2})(?<b2>[0-9a-zA-Z]{2})(?<a2>[0-9a-zA-Z]{2})?)"
-        + "$");
+    private static readonly _toColorPattern = /^(?:#?(?<r1>[0-9a-zA-Z])(?<g1>[0-9a-zA-Z])(?<b1>[0-9a-zA-Z])(?<a1>[0-9a-zA-Z])?|#?(?<r2>[0-9a-zA-Z]{2})(?<g2>[0-9a-zA-Z]{2})(?<b2>[0-9a-zA-Z]{2})(?<a2>[0-9a-zA-Z]{2})?|rgb\s*\(\s*(?<r3>-?(?:\d+(?:\.\d*)?|\.\d+))\s*,\s*(?<g3>-?(?:\d+(?:\.\d*)?|\.\d+))\s*,\s*(?<b3>-?(?:\d+(?:\.\d*)?|\.\d+))\s*(?:,\s*(?<a3>-?(?:\d+(?:\.\d*)?|\.\d+))\s*)?\))$/;
 
     public r: number;
     public g: number;
@@ -13,10 +17,7 @@ export class Color
     public a: number;
 
     public constructor(r: number, g: number, b: number, a?: number);
-    public constructor(value:
-        | [r: number, g: number, b: number, a?: number]
-        | string
-        | { r: number, g: number, b: number, a?: number });
+    public constructor(value: Colorable);
     public constructor(v1: any, v2?: any, v3?: any, v4?: any)
     {
         if (typeof v1 === "number")
@@ -49,14 +50,22 @@ export class Color
                     Number.parseInt(match.groups.a1, 0x10) / 0xF;
                 return;
             }
-
-            if (match.groups.r2 !== undefined)
+            else if (match.groups.r2 !== undefined)
             {
                 this.r = Number.parseInt(match.groups.r2, 0x10) / 0xFF;
                 this.g = Number.parseInt(match.groups.g2, 0x10) / 0xFF;
                 this.b = Number.parseInt(match.groups.b2, 0x10) / 0xFF;
                 this.a = match.groups.a2 === undefined ? 1 :
                     Number.parseInt(match.groups.a2, 0x10) / 0xFF;
+                return;
+            }
+            else if (match.groups.r3 !== undefined)
+            {
+                this.r = Number.parseInt(match.groups.r3) / 0xFF;
+                this.g = Number.parseInt(match.groups.g3) / 0xFF;
+                this.b = Number.parseInt(match.groups.b3) / 0xFF;
+                this.a = match.groups.a3 === undefined ? 1 :
+                    Number.parseFloat(match.groups.a3);
                 return;
             }
 
@@ -112,16 +121,8 @@ export class Color
     }
 
     public static blend(
-        from:
-            | Color
-            | [r: number, g: number, b: number, a?: number]
-            | string
-            | { r: number, g: number, b: number, a?: number },
-        to:
-            | Color
-            | [r: number, g: number, b: number, a?: number]
-            | string
-            | { r: number, g: number, b: number, a?: number },
+        from: Colorable,
+        to: Colorable,
         method?:
             | "linear" | "normal" | undefined
             | "multiply" | "*"
@@ -132,11 +133,7 @@ export class Color
         return new Color(from).blend(to, method);
     }
     public blend(
-        other:
-            | Color
-            | [r: number, g: number, b: number, a?: number]
-            | string
-            | { r: number, g: number, b: number, a?: number },
+        other: Colorable,
         method?:
             | "linear" | "normal" | undefined
             | "multiply" | "*"
@@ -195,6 +192,30 @@ export class Color
                     outA);
             }
         }
+    }
+
+    public static blendHex(
+        from: Colorable,
+        to: Colorable,
+        method?:
+            | "linear" | "normal" | undefined
+            | "multiply" | "*"
+            | "screen"
+            | "additive" | "+"
+            | "subtractive" | "-"): ColorHex
+    {
+        return new Color(from).blendHex(to, method);
+    }
+    public blendHex(
+        other: Colorable,
+        method?:
+            | "linear" | "normal" | undefined
+            | "multiply" | "*"
+            | "screen"
+            | "additive" | "+"
+            | "subtractive" | "-"): ColorHex
+    {
+        return this.blend(other, method).toHex();
     }
 
     public toString(): string { return this.toHex() }
