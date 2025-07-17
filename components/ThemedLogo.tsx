@@ -1,10 +1,10 @@
-import ThemeColors from "@/constants/ThemeColors";
+import { ThemeColors } from "@/constants/ThemeColors";
 import { Color } from "@/library/Color";
 import { useMemo } from "react";
 import { StyleSheet, Text, TextProps, TextStyle } from "react-native";
 
-export interface ThemedTextProps
-    extends Omit<TextProps, "style">
+export interface ThemedLogoProps
+    extends Omit<TextProps, "children" | "style">
 {
     type?:
         | "large-text"
@@ -16,16 +16,15 @@ export interface ThemedTextProps
 /**
  * A styled text component whose appearance and options derive from the Figma
  * design seen
- * [here](https://www.figma.com/design/P1BbYTpp52F5FC76qzVuGZ/Lil--Scheduler-2?node-id=1-40&t=3GOgjufC8vZUIfJo-1).
+ * [here](https://www.figma.com/design/P1BbYTpp52F5FC76qzVuGZ/Lil--Scheduler-2?node-id=1-40&t=G38GCyINp03LERn2-1).
  */
-export default function ThemedText(
+export function ThemedLogo(
 {
-    children,
     type = "large-text",
     styleOverride,
     ...rest
 }
-: ThemedTextProps)
+: ThemedLogoProps)
 {
     const styleSheet = useMemo(
         () =>
@@ -36,10 +35,10 @@ export default function ThemedText(
                 return styleSheet;
 
             return (
-            {
-                ...styleSheet,
-                ...styleOverride,
-            });
+            [
+                styleSheet,
+                styleOverride,
+            ]);
         },
         [type, styleOverride]);
 
@@ -47,11 +46,10 @@ export default function ThemedText(
         <Text
             style={styleSheet}
             {...rest}>
-            {children}
+            Lil' Scheduler
         </Text>
     )
 }
-
 
 const _themedTextStyleCache
     : (TextStyle | undefined)[] = new Array(3);

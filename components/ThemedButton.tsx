@@ -1,19 +1,17 @@
-import ThemeColors from "@/constants/ThemeColors";
+import { ThemeColors } from "@/constants/ThemeColors";
 import { Color } from "@/library/Color";
-import { iteratorMap } from "@/library/IteratorExtensions";
+import { over } from "@/library/IteratorExtensions";
 import { ReactNode } from "react";
-import { Pressable, PressableProps, PressableStateCallbackType, StyleSheet, Text, TextStyle, ViewStyle } from "react-native";
+import { Pressable, PressableProps, StyleSheet, Text, TextStyle, ViewStyle } from "react-native";
 
 export interface ThemedButtonProps
     extends Omit<PressableProps, "children" | "style">
 {
-    children?: ReactNode;
+    children: ReactNode;
     style?: "fill" | "outline" | "textonly";
     color?: "more" | "bold";
     size?: "large" | "small" | "tiny";
-    styleOverride?:
-        | ViewStyle
-        | ((state: PressableStateCallbackType) => ViewStyle);
+    styleOverride?: PressableProps["style"];
 }
 
 /**
@@ -21,7 +19,7 @@ export interface ThemedButtonProps
  * design seen
  * [here](https://www.figma.com/design/P1BbYTpp52F5FC76qzVuGZ/Lil--Scheduler-2?node-id=1-7&t=3GOgjufC8vZUIfJo-1).
  */
-export default function ThemedButton(
+export function ThemedButton(
 {
     children,
     style = "fill",
@@ -51,12 +49,12 @@ export default function ThemedButton(
                     return styleSheet;
 
                 return (
-                {
-                    ...styleSheet,
-                    ...styleOverride instanceof Function
+                [
+                    styleSheet,
+                    styleOverride instanceof Function
                         ? styleOverride(state)
                         : styleOverride,
-                });
+                ]);
             }}
             {...rest}>
             {(state) =>
@@ -75,16 +73,16 @@ export default function ThemedButton(
                 function postProcessElements(
                     elements: ReactNode): ReactNode
                 {
-                    if (elements === null
-                        || elements === undefined
+                    if (elements === undefined)
+                        return undefined;
+                    else if (elements === null
+                        || typeof elements === "string"
                         || typeof elements === "number"
                         || typeof elements === "boolean"
                         || typeof elements === "bigint")
-                        return elements;
-                    else if (typeof elements === "string")
                         return <Text style={styleSheet}>{elements}</Text>;
                     else if (Symbol.iterator in elements)
-                        return iteratorMap(elements, postProcessElements);
+                        return over(elements).map(postProcessElements);
                     else
                         return elements;
                 }
@@ -434,7 +432,7 @@ export function getThemedButtonLayoutStyle(
         case "tiny": cacheKey += 2; break;
     }
 
-    const cachedValue = _themedButtonColorStyleCache[cacheKey];
+    const cachedValue = _themedButtonLayoutStyleCache[cacheKey];
     if (cachedValue !== undefined)
         return cachedValue;
 

@@ -1,11 +1,12 @@
-import ThemeColors from "@/constants/ThemeColors";
+import { ThemeColors } from "@/constants/ThemeColors";
 import { Color } from "@/library/Color";
-import { useMemo } from "react";
+import { ReactNode, useMemo } from "react";
 import { StyleSheet, Text, TextProps, TextStyle } from "react-native";
 
 export interface ThemedTextProps
-    extends Omit<TextProps, "style">
+    extends Omit<TextProps, "children" | "style">
 {
+    children: ReactNode,
     type?:
         | "header1"
         | "header2"
@@ -14,17 +15,18 @@ export interface ThemedTextProps
         | "label"
         | "paragraph"
         | "note"
-        | "question";
+        | "question"
+        | "error";
     centered?: boolean;
-    styleOverride?: TextStyle;
+    styleOverride?: TextProps["style"];
 }
 
 /**
  * A styled text component whose appearance and options derive from the Figma
  * design seen
- * [here](https://www.figma.com/design/P1BbYTpp52F5FC76qzVuGZ/Lil--Scheduler-2?node-id=1-40&t=3GOgjufC8vZUIfJo-1).
+ * [here](https://www.figma.com/design/P1BbYTpp52F5FC76qzVuGZ/Lil--Scheduler-2?node-id=1-40&t=G38GCyINp03LERn2-1).
  */
-export default function ThemedText(
+export function ThemedText(
 {
     children,
     type = "paragraph",
@@ -43,10 +45,10 @@ export default function ThemedText(
                 return styleSheet;
 
             return (
-            {
-                ...styleSheet,
-                ...styleOverride,
-            });
+            [
+                styleSheet,
+                styleOverride,
+            ]);
         },
         [type, centered, styleOverride]);
 
@@ -58,7 +60,6 @@ export default function ThemedText(
         </Text>
     )
 }
-
 
 const _themedTextStyleCache
     : (TextStyle | undefined)[] = new Array(8 * 2);
@@ -72,7 +73,8 @@ export function getThemedTextStyle(
         | "label"
         | "paragraph"
         | "note"
-        | "question",
+        | "question"
+        | "error",
     centered?: boolean): TextStyle
 {
     let cacheKey = 0;
@@ -86,8 +88,9 @@ export function getThemedTextStyle(
         case "paragraph": cacheKey += 5; centered ??= false; break;
         case "note": cacheKey += 6; centered ??= true; break;
         case "question": cacheKey += 7; centered ??= true; break;
+        case "error": cacheKey += 8; centered ??= true; break;
     }
-    cacheKey = (cacheKey * 8) + (centered ? 1 : 0);
+    cacheKey = (cacheKey * 9) + (centered ? 1 : 0);
 
     const cachedValue = _themedTextStyleCache[cacheKey];
     if (cachedValue !== undefined)
@@ -229,6 +232,22 @@ export function getThemedTextStyle(
                     fontSize: 24,
                     fontWeight: 500,
                     color: ThemeColors.text,
+                },
+            });
+            break;
+        case "error":
+            styleSheet = StyleSheet.create(
+            {
+                text:
+                {
+                    marginTop: 16,
+                    marginBottom: 16,
+                    marginInline: 8,
+                    textAlign: centered ? "center" : "auto",
+                    verticalAlign: "bottom",
+                    fontSize: 14,
+                    fontWeight: 600,
+                    color: "#E03838",
                 },
             });
             break;

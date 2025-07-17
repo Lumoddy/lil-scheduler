@@ -3,6 +3,7 @@ export type ColorHex = `#${string}`;
 
 export type Colorable =
     | Color
+    | number
     | string
     | [r: number, g: number, b: number, a?: number]
     | { r: number, g: number, b: number, a?: number };
@@ -20,12 +21,19 @@ export class Color
     public constructor(value: Colorable);
     public constructor(v1: any, v2?: any, v3?: any, v4?: any)
     {
-        if (typeof v1 === "number")
+        if (typeof v2 === "number")
         {
             this.r = v1;
             this.g = v2;
             this.b = v3;
             this.a = v4 ?? 1;
+        }
+        else if (typeof v1 === "number")
+        {
+            this.r = Math.min(Math.max(0, v1), 1);
+            this.g = Math.min(Math.max(0, v1), 1);
+            this.b = Math.min(Math.max(0, v1), 1);
+            this.a = 1;
         }
         else if (v1 instanceof Array)
         {

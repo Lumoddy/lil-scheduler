@@ -1,13 +1,13 @@
-import { iteratorMap } from "@/library/IteratorExtensions";
+import { over } from "@/library/IteratorExtensions";
 import { Link, LinkProps } from "expo-router";
 import { ReactNode, useMemo } from "react";
 import { StyleSheet, Text, ViewStyle } from "react-native";
 import { getThemedButtonColorStyle, getThemedButtonLayoutStyle } from "./ThemedButton";
 
-export interface ThemedButtonProps
+export interface ThemedLinkProps
     extends Omit<LinkProps, "children" | "style">
 {
-    children?: ReactNode;
+    children: ReactNode;
     style?: "fill" | "outline" | "textonly";
     color?: "more" | "bold";
     size?: "large" | "small" | "tiny";
@@ -19,7 +19,7 @@ export interface ThemedButtonProps
  * in the Figma design seen
  * [here](https://www.figma.com/design/P1BbYTpp52F5FC76qzVuGZ/Lil--Scheduler-2?node-id=1-7&t=3GOgjufC8vZUIfJo-1).
  */
-export default function ThemedButton(
+export function ThemedLink(
 {
     children,
     style = "fill",
@@ -28,7 +28,7 @@ export default function ThemedButton(
     styleOverride,
     ...rest
 }
-: ThemedButtonProps)
+: ThemedLinkProps)
 {
     const containerStyleSheet = useMemo(
         () =>
@@ -76,7 +76,7 @@ export default function ThemedButton(
                 else if (typeof elements === "string")
                     return <Text style={textStyleSheet}>{elements}</Text>;
                 else if (Symbol.iterator in elements)
-                    return iteratorMap(elements, postProcessElements);
+                    return over(elements).map(postProcessElements);
                 else
                     return elements;
             }
