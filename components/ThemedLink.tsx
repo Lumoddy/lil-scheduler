@@ -1,11 +1,12 @@
 import { over } from "@/library/IteratorExtensions";
 import { Link, LinkProps } from "expo-router";
-import { ReactNode, useMemo } from "react";
-import { StyleSheet, Text, ViewStyle } from "react-native";
+import { ReactNode, RefAttributes, useMemo } from "react";
+import { StyleSheet, Text, View, ViewStyle } from "react-native";
 import { getThemedButtonColorStyle, getThemedButtonLayoutStyle } from "./ThemedButton";
 
 export interface ThemedLinkProps
-    extends Omit<LinkProps, "children" | "style">
+    extends Omit<LinkProps, "children" | "style">,
+    RefAttributes<View>
 {
     children: ReactNode;
     style?: "fill" | "outline" | "textonly";

@@ -1,10 +1,11 @@
 import { ThemeColors } from "@/constants/ThemeColors";
 import { Color } from "@/library/Color";
-import { useMemo } from "react";
+import { RefAttributes, useMemo } from "react";
 import { StyleSheet, Text, TextProps, TextStyle } from "react-native";
 
 export interface ThemedLogoProps
-    extends Omit<TextProps, "children" | "style">
+    extends Omit<TextProps, "children" | "style">,
+    RefAttributes<Text>
 {
     type?:
         | "large-text"

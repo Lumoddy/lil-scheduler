@@ -1,11 +1,12 @@
 import { ThemeColors } from "@/constants/ThemeColors";
 import { Color } from "@/library/Color";
 import { over } from "@/library/IteratorExtensions";
-import { ReactNode } from "react";
-import { Pressable, PressableProps, StyleSheet, Text, TextStyle, ViewStyle } from "react-native";
+import { ReactNode, RefAttributes } from "react";
+import { Pressable, PressableProps, StyleSheet, Text, TextStyle, View, ViewStyle } from "react-native";
 
 export interface ThemedButtonProps
-    extends Omit<PressableProps, "children" | "style">
+    extends Omit<PressableProps, "children" | "style">,
+    RefAttributes<View>
 {
     children: ReactNode;
     style?: "fill" | "outline" | "textonly";

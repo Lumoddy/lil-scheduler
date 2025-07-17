@@ -1,11 +1,12 @@
 import { CalenderStateContext } from "@/contexts/CalendarState";
 import { useRouter } from "expo-router";
-import { useContext } from "react";
+import { RefAttributes, useContext } from "react";
 import { View, ViewStyle } from "react-native";
 import { ThemedButton } from "./ThemedButton";
 import { ThemedText } from "./ThemedText";
 
 export interface ThemedCalendarDayProps
+    extends RefAttributes<View>
 {
     date: Date;
     styleOverride: ViewStyle;
@@ -14,7 +15,8 @@ export interface ThemedCalendarDayProps
 export function ThemedCalendarDay(
 {
     date,
-    styleOverride
+    styleOverride,
+    ...rest
 }
 : ThemedCalendarDayProps)
 {
@@ -36,17 +38,20 @@ export function ThemedCalendarDay(
             setContextDate(date);
 
             useRouter().dismissTo("/(tabs)/Calendar/Day");
-        }}/>;
+        }}
+        {...rest}/>;
 }
 
 export interface ThemedCalendarMonthProps
+    extends RefAttributes<View>
 {
     date: Date;
 }
 
 export function ThemedCalendarMonth(
 {
-    date
+    date,
+    ...rest
 }
 : ThemedCalendarMonthProps)
 {
@@ -71,7 +76,7 @@ export function ThemedCalendarMonth(
     }
 
     return (
-        <View>
+        <View {...rest}>
             <ThemedText
                 type="header2"
                 centered={false}

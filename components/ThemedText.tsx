@@ -1,10 +1,11 @@
 import { ThemeColors } from "@/constants/ThemeColors";
 import { Color } from "@/library/Color";
-import { ReactNode, useMemo } from "react";
+import { ReactNode, RefAttributes, useMemo } from "react";
 import { StyleSheet, Text, TextProps, TextStyle } from "react-native";
 
 export interface ThemedTextProps
-    extends Omit<TextProps, "children" | "style">
+    extends Omit<TextProps, "children" | "style">,
+    RefAttributes<Text>
 {
     children: ReactNode,
     type?:

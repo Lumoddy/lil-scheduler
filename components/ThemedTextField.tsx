@@ -1,10 +1,11 @@
 import { ThemeColors } from "@/constants/ThemeColors";
 import { Color } from "@/library/Color";
-import { useMemo } from "react";
+import { RefAttributes, useMemo } from "react";
 import { StyleSheet, TextInput, TextInputProps, TextStyle } from "react-native";
 
 export interface ThemedTextFieldProps
-    extends Omit<TextInputProps, "children" | "style">
+    extends Omit<TextInputProps, "children" | "style">,
+    RefAttributes<TextInput>
 {
     style?:
         | "fill"
