@@ -1,12 +1,10 @@
-import { ReactNativeFirebase } from "@react-native-firebase/app";
+import { FirebaseApp, FirebaseAppOptions } from "@/library/FirebaseMerge/App";
 import { createContext } from "react";
 
-export { initializeApp } from "@react-native-firebase/app";
-
 export const FirebaseAppContext
-    = createContext<ReactNativeFirebase.FirebaseApp | undefined>(undefined!);
+    = createContext<FirebaseApp | undefined>(undefined!);
 
-export const firebaseAppOptions =
+export const firebaseAppOptions: FirebaseAppOptions =
 {
     apiKey: "AIzaSyC1stMS6T-1lrQMfuHTOtNK-PxPrbHtbww",
     authDomain: "lil-scheduler.firebaseapp.com",
@@ -15,4 +13,4 @@ export const firebaseAppOptions =
     storageBucket: "lil-scheduler.firebasestorage.app",
     messagingSenderId: "585357721558",
     appId: "1:585357721558:web:59358d17758788827dee77",
-} as ReactNativeFirebase.FirebaseAppOptions;
+};

@@ -29,7 +29,7 @@ export default function()
                     header: themedHeader(),
                     headerTitle: themedLogoTag("faded-text"),
                 }}/>
-            <ThemedText type="header1" children="Login"/>
+            <ThemedText type="header1" children="Create Account"/>
             <ScrollView
                 contentContainerStyle={
                 {
@@ -76,8 +76,8 @@ export default function()
 
                             nativeOrWeb(
                             {
-                                native: NativeAuth.signInWithEmailAndPassword,
-                                web: WebAuth.signInWithEmailAndPassword,
+                                native: NativeAuth.createUserWithEmailAndPassword,
+                                web: WebAuth.createUserWithEmailAndPassword,
                             })(
                                 auth,
                                 emailInput,
@@ -101,10 +101,10 @@ export default function()
                             maxWidth: 400,
                             marginInline: 32,
                         }}
-                        children="Login"/>
+                        children="Create Account"/>
                     <ThemedLink
                         replace
-                        href="/Signup"
+                        href="/Login"
                         style="fill"
                         color="more"
                         size="small"
@@ -113,7 +113,7 @@ export default function()
                             maxWidth: 368,
                             marginInline: 48,
                         }}
-                        children="Create account instead"/>
+                        children="Login instead"/>
                 </View>
             </ScrollView>
         </Group>

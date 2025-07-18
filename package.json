@@ -12,6 +12,9 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
+    "@firebase/app": "^0.14.0",
+    "@firebase/auth": "^1.11.0",
+    "@firebase/firestore": "^4.9.0",
     "@react-native-firebase/app": "^22.4.0",
     "@react-native-firebase/auth": "^22.4.0",
     "@react-native-firebase/firestore": "^22.4.0",

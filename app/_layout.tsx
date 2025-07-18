@@ -1,18 +1,27 @@
 import { ThemedText } from "@/components/ThemedText";
 import { ThemeColors } from "@/constants/ThemeColors";
-import { appConfig, FirebaseAppContext } from "@/contexts/Firebase";
+import { FirebaseAppContext, firebaseAppOptions } from "@/contexts/Firebase";
 import { UserDataContext } from "@/contexts/UserData";
+import { defaultAppName, FirebaseApp, getApps, initializeApp } from "@/library/FirebaseMerge/App";
 import { Stack } from "expo-router";
-import { initializeApp } from "firebase/app";
+import { useEffect, useState } from "react";
+import 'setimmediate';
 
 export default function()
 {
+    const [app, setApp] = useState<FirebaseApp>();
+    useEffect(() =>
+    {
+        if (!getApps().some((app) => app.name === defaultAppName))
+            initializeApp(firebaseAppOptions, defaultAppName).then(setApp);
+    });
+
     return (
         <UserDataContext value={
             {
                 
             }}>
-            <FirebaseAppContext value={initializeApp(appConfig)}>
+            <FirebaseAppContext value={app}>
                 <Stack
                     screenOptions={
                     {
