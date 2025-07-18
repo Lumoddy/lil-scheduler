@@ -1,5 +1,6 @@
 import { ThemedText } from "@/components/ThemedText";
 import { ThemeColors } from "@/constants/ThemeColors";
+import { BackgroundPressable } from "@/contexts/BackgroundPressable";
 import { FirebaseAppContext, firebaseAppOptions } from "@/contexts/Firebase";
 import { UserDataContext } from "@/contexts/UserData";
 import { defaultAppName, FirebaseApp, getApps, initializeApp } from "@/library/FirebaseMerge/App";
@@ -34,18 +35,20 @@ export default function()
                 
             }}>
             <FirebaseAppContext value={app}>
-                <Stack
-                    screenOptions={
-                    {
-                        contentStyle:
+                <BackgroundPressable>
+                    <Stack
+                        screenOptions={
                         {
-                            backgroundColor: ThemeColors.background,
-                            userSelect: "none",
-                        },
-                        header: () => <ThemedText type="header1">Test</ThemedText>,
-                    }}>
-                    <Stack.Screen name="(tabs)" options={{ headerShown: false }}/>
-                </Stack>
+                            contentStyle:
+                            {
+                                backgroundColor: ThemeColors.background,
+                                userSelect: "none",
+                            },
+                            header: () => <ThemedText type="header1">Test</ThemedText>,
+                        }}>
+                        <Stack.Screen name="(tabs)" options={{ headerShown: false }}/>
+                    </Stack>
+                </BackgroundPressable>
             </FirebaseAppContext>
         </UserDataContext>
     );

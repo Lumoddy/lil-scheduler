@@ -224,7 +224,7 @@ class _Iterator<T, TReturn, TNext> implements IteratorObject<T, TReturn, TNext>
     return(value?: TReturn | undefined): IteratorResult<T, TReturn>
     {
         if (this._from.return === undefined)
-            throw new Error("Method not implemented.");
+            return { value: undefined as TReturn, done: true };
 
         return this._from.return(value);
     }
@@ -232,7 +232,7 @@ class _Iterator<T, TReturn, TNext> implements IteratorObject<T, TReturn, TNext>
     throw(e?: any): IteratorResult<T, TReturn>
     {
         if (this._from.throw === undefined)
-            throw new Error("Method not implemented.");
+            return { value: undefined as TReturn, done: true };
 
         return this._from.throw(e);
     }
