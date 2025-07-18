@@ -5,4 +5,7 @@
     "source.sortMembers": "explicit"
   },
   "typescript.preferences.importModuleSpecifierEnding": "index",
+  "cSpell.words": [
+    "lilscheduler"
+  ],
 }

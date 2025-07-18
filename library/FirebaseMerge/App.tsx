@@ -1,7 +1,7 @@
 import * as Web from "@firebase/app";
 import * as Native from "@react-native-firebase/app";
-import { nativeOrWebImport, nativeOrWebMap, NativeOrWebResult } from "../PlatformExtensions";
-export { nativeOrWebMap as firebaseMap, Native as NativeApp, Web as WebApp };
+import { nativeOrWebImport, NativeOrWebResult } from "../PlatformExtensions";
+export { Native as NativeApp, Web as WebApp };
 
 export type FirebaseApp = Web.FirebaseApp & Native.ReactNativeFirebase.FirebaseApp;
 

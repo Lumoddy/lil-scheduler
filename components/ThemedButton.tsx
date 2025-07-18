@@ -26,6 +26,7 @@ export function ThemedButton(
     style = "fill",
     color = "more",
     size = "small",
+    disabled = false,
     styleOverride,
     ...rest
 }
@@ -42,7 +43,8 @@ export function ThemedButton(
                         color,
                         state.pressed ? "pressed" :
                             state.hovered ? "hover" :
-                            "none").container,
+                            "none",
+                        disabled).container,
                     getThemedButtonLayoutStyle(size).container,
                 ]);
 
@@ -67,7 +69,8 @@ export function ThemedButton(
                         color,
                         state.pressed ? "pressed" :
                             state.hovered ? "hover" :
-                            "none").text,
+                            "none",
+                        disabled).text,
                     getThemedButtonLayoutStyle(size).text,
                 ]);
 
@@ -83,7 +86,7 @@ export function ThemedButton(
                         || typeof elements === "bigint")
                         return <Text style={styleSheet}>{elements}</Text>;
                     else if (Symbol.iterator in elements)
-                        return over(elements).map(postProcessElements);
+                        return [...over(elements).map(postProcessElements)];
                     else
                         return elements;
                 }
@@ -99,12 +102,13 @@ const _themedButtonColorStyleCache
         container: ViewStyle,
         text: TextStyle,
     }
-    | undefined)[] = new Array(3 * 2 * 3);
+    | undefined)[] = new Array(3 * 2 * 3 * 2);
 
 export function getThemedButtonColorStyle(
     style: "fill" | "outline" | "textonly",
     color: "more" | "bold",
-    state: "none" | "hover" | "pressed" = "none")
+    state: "none" | "hover" | "pressed" = "none",
+    disabled?: boolean | null)
     : {
         container: ViewStyle,
         text: TextStyle,
@@ -128,6 +132,7 @@ export function getThemedButtonColorStyle(
         case "hover": cacheKey = (cacheKey * 2) + 1; break;
         case "pressed": cacheKey = (cacheKey * 2) + 2; break;
     }
+    cacheKey = (cacheKey * 3) + (disabled ? 1 : 0);
 
     const cachedValue = _themedButtonColorStyleCache[cacheKey];
     if (cachedValue !== undefined)
@@ -136,7 +141,49 @@ export function getThemedButtonColorStyle(
     const OUTLINE_BORDER_WIDTH = 1;
     let styleSheet;
 
-    switch (style)
+    if (disabled)
+    {
+        styleSheet = getThemedButtonColorStyle(style, color, state, false);
+        styleSheet = StyleSheet.create(
+        {
+            container:
+            {
+                ...styleSheet.container,
+                backgroundColor:
+                    typeof styleSheet.container.backgroundColor === "string"
+                        ? Color.blendHex(Color.blend(Color.blend(
+                            styleSheet.container.backgroundColor,
+                            new Color(1, 1, 1, 0.5),
+                            "*"),
+                            ThemeColors.less),
+                            ThemeColors.less)
+                        : styleSheet.container.backgroundColor,
+                borderColor:
+                    typeof styleSheet.container.borderColor === "string"
+                        ? Color.blendHex(Color.blend(Color.blend(
+                            styleSheet.container.borderColor,
+                            new Color(1, 1, 1, 0.5),
+                            "*"),
+                            ThemeColors.less),
+                            ThemeColors.less)
+                        : styleSheet.container.borderColor,
+            },
+            text:
+            {
+                ...styleSheet.text,
+                color:
+                    typeof styleSheet.text.color === "string"
+                        ? Color.blendHex(Color.blend(Color.blend(
+                            styleSheet.text.color,
+                            new Color(1, 1, 1, 0.5),
+                            "*"),
+                            ThemeColors.less),
+                            ThemeColors.less)
+                        : styleSheet.text.color,
+            },
+        });
+    }
+    else switch (style)
     {
         case "fill":
             switch (state)

@@ -24,8 +24,10 @@ export function themedLogoTag(type?: ThemedLogoProps["type"]): string
         return `$logo-${type}`;
 }
 
-export function themedHeader()
+export function themedHeader(props?: { lockUI: boolean })
 {
+    const { lockUI } = props ?? {};
+
     return (props: ThemedHeaderProps) => (
         <View
             style={
@@ -34,32 +36,35 @@ export function themedHeader()
                 minHeight: 90,
                 paddingBottom: 20,
                 paddingTop: Platform.OS === "ios" ? 20 : 0,
+                position: "relative",
             }}>
             {
-                props.options.headerTitle === "$logo"
+                (props.options.headerTitle ?? props.options.title) === "$logo"
                     ? <ThemedLogo
                         type={props.options.headerLargeTitle
                             ? "large-text"
                             : "faded-text"}/> :
-                props.options.headerTitle === "$logo-large-text"
+                (props.options.headerTitle ?? props.options.title) === "$logo-large-text"
                     ? <ThemedLogo type="large-text"/> :
-                props.options.headerTitle === "$logo-small-text"
+                (props.options.headerTitle ?? props.options.title) === "$logo-small-text"
                     ? <ThemedLogo type="small-text"/> :
-                props.options.headerTitle === "$logo-faded-text"
+                (props.options.headerTitle ?? props.options.title) === "$logo-faded-text"
                     ? <ThemedLogo type="faded-text"/> :
                 props.options.headerTitle instanceof Function
                     ? props.options.headerTitle({ children: props.route.name }) :
                 <ThemedText
-                    children={props.options.headerTitle ?? props.route.name}
                     type={props.options.headerLargeTitle
                         ? "header1"
-                        : "header3"}/>
+                        : "header3"}
+                    children={props.options.headerTitle ?? props.options.title ?? props.route.name}/>
             }
             <Row
                 style={
                 {
                     position: "absolute",
                     bottom: 0,
+                    left: 0,
+                    right: 0,
                 }}>
                 {
                     props.options.headerLeft !== undefined
@@ -72,6 +77,7 @@ export function themedHeader()
                             || props.back.href === undefined
                             ? undefined
                             : <ThemedLink
+                                disabled={lockUI}
                                 href={props.back.href as Href}
                                 children={props.back.title ?? "Back"}/>
                 }

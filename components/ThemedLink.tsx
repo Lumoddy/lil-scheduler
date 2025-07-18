@@ -26,6 +26,7 @@ export function ThemedLink(
     style = "fill",
     color = "more",
     size = "small",
+    disabled = false,
     styleOverride,
     ...rest
 }
@@ -36,7 +37,11 @@ export function ThemedLink(
         {
             const styleSheet = StyleSheet.flatten(
             [
-                getThemedButtonColorStyle(style, color, "none").container,
+                getThemedButtonColorStyle(
+                    style,
+                    color,
+                    "none",
+                    disabled).container,
                 getThemedButtonLayoutStyle(size).container,
             ]);
 
@@ -56,7 +61,11 @@ export function ThemedLink(
         {
             return StyleSheet.flatten(
             [
-                getThemedButtonColorStyle(style, color, "none").text,
+                getThemedButtonColorStyle(
+                    style,
+                    color,
+                    "none",
+                    disabled).text,
                 getThemedButtonLayoutStyle(size).text,
             ]);
         },
@@ -77,7 +86,7 @@ export function ThemedLink(
                 else if (typeof elements === "string")
                     return <Text style={textStyleSheet}>{elements}</Text>;
                 else if (Symbol.iterator in elements)
-                    return over(elements).map(postProcessElements);
+                    return [...over(elements).map(postProcessElements)];
                 else
                     return elements;
             }

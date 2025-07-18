@@ -1,10 +1,9 @@
 import { Group } from "@/components/Flex";
-import { ThemedButton } from "@/components/ThemedButton";
+import { themedHeader, themedHeaderButton } from "@/components/ThemedHeader";
 import { ThemeColors } from "@/constants/ThemeColors";
 import { CalenderStateContext } from "@/contexts/CalendarState";
 import { Stack, useRouter } from "expo-router";
 import { useContext } from "react";
-import { Button, Platform } from "react-native";
 
 export default function()
 {
@@ -32,26 +31,16 @@ export default function()
                         day: "numeric",
                         year: "numeric",
                     }),
-                headerRight()
-                {
-                    switch (Platform.OS)
+                header: themedHeader(),
+                headerRight: themedHeaderButton(
+                    "Calender",
                     {
-                        case "ios":
-                            return <Button
-                                title="Calender"
-                                color={ThemeColors.bold}
-                                onPress={() => useRouter()
-                                    .navigate("/(tabs)/Calendar/DatePicker")}/>
-                        default:
-                            return <ThemedButton
-                                children="Calender"
-                                style="textonly"
-                                color="bold"
-                                size="small"
-                                onPress={() => useRouter()
-                                    .navigate("/(tabs)/Calendar/DatePicker")}/>;
-                    }
-                },
+                        onPress()
+                        {
+                            useRouter()
+                                .navigate("/(tabs)/Calendar/DatePicker");
+                        },
+                    }),
             }}/>
         </Group>
     );
