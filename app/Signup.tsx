@@ -5,7 +5,7 @@ import { ThemedLink } from "@/components/ThemedLink";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedTextField } from "@/components/ThemedTextField";
 import { FirebaseAppContext } from "@/contexts/Firebase";
-import { Auth, getAuth, NativeAuth, WebAuth } from "@/library/FirebaseMerge/Auth";
+import { FirebaseAuth, getAuth, NativeAuth, WebAuth } from "@/library/FirebaseMerge/Auth";
 import { nativeOrWeb } from "@/library/PlatformExtensions";
 import { Stack, useRouter } from "expo-router";
 import { useContext, useEffect, useState } from "react";
@@ -18,7 +18,7 @@ export default function()
     const [errorMessage, setErrorMessage] = useState<string>("");
 
     const app = useContext(FirebaseAppContext);
-    const [auth, setAuth] = useState<Auth>();
+    const [auth, setAuth] = useState<FirebaseAuth>();
     useEffect(() => setAuth(() => getAuth(app)), [app]);
 
     const [lockUI, setLockUI] = useState(false);

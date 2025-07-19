@@ -3,7 +3,10 @@ import * as Native from "@react-native-firebase/firestore";
 import { nativeOrWebImport, NativeOrWebResult } from "../PlatformExtensions";
 export { Native as NativeFirestore, Web as WebFirestore };
 
-export type Firestore = Web.Firestore & Native.FirebaseFirestoreTypes.Module;
+export type NativeFirebaseFirestore = Native.FirebaseFirestoreTypes.Module;
+export type WebFirebaseFirestore = Web.Firestore;
+
+export type FirebaseFirestore = NativeFirebaseFirestore & WebFirebaseFirestore;
 
 export const getFirestore = firebaseFirestoreImport("getFirestore");
 

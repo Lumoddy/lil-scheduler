@@ -3,7 +3,10 @@ import * as Native from "@react-native-firebase/auth";
 import { nativeOrWebImport, NativeOrWebResult } from "../PlatformExtensions";
 export { Native as NativeAuth, Web as WebAuth };
 
-export type Auth = Web.Auth & Native.FirebaseAuthTypes.Module;
+export type NativeFirebaseAuth = Native.FirebaseAuthTypes.Module;
+export type WebFirebaseAuth = Web.Auth;
+
+export type FirebaseAuth = NativeFirebaseAuth & WebFirebaseAuth;
 
 export const getAuth = firebaseAuthImport("getAuth");
 

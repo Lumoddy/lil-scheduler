@@ -3,25 +3,14 @@ import * as Native from "@react-native-firebase/app";
 import { nativeOrWebImport, NativeOrWebResult } from "../PlatformExtensions";
 export { Native as NativeApp, Web as WebApp };
 
-export type FirebaseApp = Web.FirebaseApp & Native.ReactNativeFirebase.FirebaseApp;
+export type NativeFirebaseApp = Native.ReactNativeFirebase.FirebaseApp;
+export type WebFirebaseApp = Web.FirebaseApp;
+
+export type FirebaseApp = NativeFirebaseApp & WebFirebaseApp;
 
 export type FirebaseAppOptions = Web.FirebaseOptions & Native.ReactNativeFirebase.FirebaseAppOptions;
 
 export const defaultAppName = "[DEFAULT]";
-
-export const initializeApp = firebaseAppImport(
-{
-    native: (n) => (
-        options: Native.ReactNativeFirebase.FirebaseAppOptions,
-        name?: string) => n.initializeApp(options, name),
-    web: (n) => async (
-        options: Web.FirebaseOptions,
-        name?: string) => n.initializeApp(options, name),
-});
-
-export const getApp = firebaseAppImport("getApp");
-
-export const getApps = firebaseAppImport("getApps");
 
 export function firebaseAppImport<
     const K extends keyof typeof Native & keyof typeof Web>(

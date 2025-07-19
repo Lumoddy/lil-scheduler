@@ -93,6 +93,7 @@ export function BackgroundPressable({ children }: { children?: ReactNode })
             style={
             {
                 flex: 1,
+                cursor: "auto",
             }}
             {...callbacks}>
             <BackgroundPressableContext value={

@@ -1,20 +1,22 @@
 import { BackgroundPressableContext } from "@/contexts/BackgroundPressable";
 import { IterateOver, over } from "@/library/IteratorExtensions";
 import { ReactNode, RefAttributes, useContext, useEffect, useMemo, useState } from "react";
-import { PressableProps, View, ViewStyle } from "react-native";
+import { PressableProps, StyleSheet, View, ViewStyle } from "react-native";
 import { Expand } from "./Flex";
-import { ThemedButton } from "./ThemedButton";
+import { getThemedButtonColorStyle, getThemedButtonLayoutStyle, ThemedButton } from "./ThemedButton";
 
 export interface ThemedDropdownProps<T>
     extends Omit<PressableProps, "children" | "style">,
     RefAttributes<View>
 {
     options: IterateOver<{ name?: ReactNode, value: T }>;
+    index?: number,
+    value?: T,
     style?: "fill" | "outline" | "textonly";
     color?: "more" | "bold";
     size?: "large" | "small" | "tiny";
     styleOverride?: ViewStyle;
-    onChange?: (value: T) => void;
+    onChange?: (value: T, index: number) => void;
 }
 
 /**
@@ -25,6 +27,8 @@ export interface ThemedDropdownProps<T>
 export function ThemedDropdown<T>(
 {
     options,
+    index: propIndex,
+    value: propValue,
     style = "fill",
     color = "more",
     size = "small",
@@ -35,7 +39,41 @@ export function ThemedDropdown<T>(
 }
 : ThemedDropdownProps<T>)
 {
+    if (propIndex !== undefined && propValue !== undefined)
+        throw new Error("Cannot define both index and value for ThemedDropdown.");
+
     const [index, setIndex] = useState(0);
+    useEffect(
+        () =>
+        {
+            if (propIndex === undefined || propIndex === index)
+                return;
+
+            setIndex(propIndex);
+        },
+        [propIndex, index]);
+    useEffect(
+        () =>
+        {
+            if (propValue === undefined)
+                return;
+
+            let i = 0;
+            for (const option of over(options))
+            {
+                if (option.value === propValue)
+                {
+                    setIndex(i);
+                    return;
+                }
+
+                ++i;
+            }
+
+            setIndex(-1);
+        },
+        [propValue, index, options]);
+
     const [optionsShown, setOptionsShown] = useState(false);
 
     const chosenOption = useMemo(
@@ -48,7 +86,7 @@ export function ThemedDropdown<T>(
 
             return { value: undefined, name: [] };
         },
-        [index]);
+        [index, options]);
 
     const processedOptions = useMemo(
         () =>
@@ -59,10 +97,10 @@ export function ThemedDropdown<T>(
                     {
                         setIndex(i);
                         setOptionsShown(false);
-                        onChange?.(option.value);
+                        onChange?.(option.value!, i);
                     }}
-                    style={style}
-                    color={color}
+                    style="fill"
+                    color="bold"
                     size={size}
                     children={option.name ?? String(option.value)}/>)];
         },
@@ -88,20 +126,33 @@ export function ThemedDropdown<T>(
                 style={style}
                 color={color}
                 size={size}
+                styleOverride={StyleSheet.flatten(
+                [
+                    styleOverride,
+                    {
+                        flex: 1,
+                    },
+                ])}
                 {...rest}>
                 {chosenOption.name ?? String(chosenOption.value)}
                 <Expand/>
                 {"v"}
             </ThemedButton>
             <View
-                style={
-                {
-                    display: optionsShown ? "flex" : "none",
-                    position: "absolute",
-                    left: 0,
-                    right: 0,
-                    top: 0,
-                }}>
+                style={StyleSheet.flatten(
+                [
+                    getThemedButtonColorStyle("fill", "bold").container,
+                    getThemedButtonLayoutStyle(size).container,
+                    {
+                        padding: 0,
+                        flexDirection: "column",
+                        display: optionsShown ? "flex" : "none",
+                        position: "absolute",
+                        left: 0,
+                        right: 0,
+                        top: 0,
+                    },
+                ])}>
                 {processedOptions}
             </View>
         </View>

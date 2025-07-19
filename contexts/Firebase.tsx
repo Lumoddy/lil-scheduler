@@ -1,8 +1,16 @@
 import { FirebaseApp, FirebaseAppOptions } from "@/library/FirebaseMerge/App";
+import { FirebaseAuth } from "@/library/FirebaseMerge/Auth";
+import { FirebaseFirestore } from "@/library/FirebaseMerge/Firestore";
 import { createContext } from "react";
 
 export const FirebaseAppContext
-    = createContext<FirebaseApp | undefined>(undefined!);
+    = createContext<FirebaseApp | undefined>(undefined);
+
+export const FirebaseAuthContext
+    = createContext<FirebaseAuth | undefined>(undefined);
+
+export const FirebaseFirestoreContext
+    = createContext<FirebaseFirestore | undefined>(undefined);
 
 export const firebaseAppOptions: FirebaseAppOptions =
 {

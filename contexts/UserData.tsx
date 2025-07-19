@@ -1,9 +1,10 @@
 import { TaskDefinition } from "@/library/Task";
-import { createContext } from "react";
+import { createContext, Dispatch, SetStateAction } from "react";
 
 export interface UserData
 {
-    tasks?: TaskDefinition[];
+    readonly tasks: TaskDefinition[] | undefined;
+    setTasks: Dispatch<SetStateAction<TaskDefinition[] | undefined>>;
 }
 
 export const UserDataContext = createContext<UserData | undefined>(undefined);

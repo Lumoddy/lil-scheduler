@@ -1,6 +1,15 @@
 import { Platform } from "react-native";
+import { NativeFirebaseApp, WebFirebaseApp } from "./FirebaseMerge/App";
+import { NativeFirebaseAuth, WebFirebaseAuth } from "./FirebaseMerge/Auth";
+import { NativeFirebaseFirestore, WebFirebaseFirestore } from "./FirebaseMerge/Firestore";
 
 export type NativeOrWebResult<TNative, TWeb> =
+    [TNative, TWeb] extends
+    [
+        Promise<infer TNativePromiseValue>,
+        Promise<infer TWebPromiseValue>,
+    ]
+        ? Promise<TNativePromiseValue & TWebPromiseValue> :
     [TNative, TWeb] extends
     [
         (...args: infer TNativeIn) => infer TNativeOut,
@@ -15,6 +24,35 @@ export type NativeOrWebResult<TNative, TWeb> =
             : (...args: TNativeIn | TWebIn) => TNativeOut & TWebOut
         : TNative & TWeb;
 
+type _NativeOrWebMapPair<TNative, TWeb, TNativeResult, TWebResult> = 
+[
+    value: TNative | TWeb,
+    mapper:
+    {
+        readonly native: (value: TNative) => TNativeResult,
+        readonly web: (value: TWeb) => TWebResult
+    },
+];
+
+// Overloads here to specify types for common maps without having to specify manually.
+export function nativeOrWebMap<TNativeResult, TWebResult>(
+    ...args: _NativeOrWebMapPair<NativeFirebaseApp, WebFirebaseApp, TNativeResult, TWebResult>)
+    : NativeOrWebResult<TNativeResult, TWebResult>;
+export function nativeOrWebMap<TNativeResult, TWebResult>(
+    ...args: _NativeOrWebMapPair<NativeFirebaseAuth, WebFirebaseAuth, TNativeResult, TWebResult>)
+    : NativeOrWebResult<TNativeResult, TWebResult>;
+export function nativeOrWebMap<TNativeResult, TWebResult>(
+    ...args: _NativeOrWebMapPair<NativeFirebaseFirestore, WebFirebaseFirestore, TNativeResult, TWebResult>)
+    : NativeOrWebResult<TNativeResult, TWebResult>;
+export function nativeOrWebMap<TNativeResult, TWebResult>(
+    ...args: _NativeOrWebMapPair<[NativeFirebaseAuth, NativeFirebaseFirestore], [WebFirebaseAuth, WebFirebaseFirestore], TNativeResult, TWebResult>)
+    : NativeOrWebResult<TNativeResult, TWebResult>;
+export function nativeOrWebMap<TNativeResult, TWebResult>(
+    ...args: _NativeOrWebMapPair<[NativeFirebaseApp, NativeFirebaseAuth, NativeFirebaseFirestore], [WebFirebaseApp, WebFirebaseAuth, WebFirebaseFirestore], TNativeResult, TWebResult>)
+    : NativeOrWebResult<TNativeResult, TWebResult>;
+export function nativeOrWebMap<const TNative, const TWeb, TNativeResult, TWebResult>(
+    ...args: _NativeOrWebMapPair<TNative, TWeb, TNativeResult, TWebResult>)
+    : NativeOrWebResult<TNativeResult, TWebResult>;
 export function nativeOrWebMap<const TNative, const TWeb, TNativeResult, TWebResult>(
     value: TNative | TWeb,
     mapper:

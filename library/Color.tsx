@@ -19,9 +19,12 @@ export class Color
 
     public constructor(r: number, g: number, b: number, a?: number);
     public constructor(value: Colorable);
-    public constructor(v1: any, v2?: any, v3?: any, v4?: any)
+    public constructor(v1: unknown, v2?: unknown, v3?: unknown, v4?: unknown)
     {
-        if (typeof v2 === "number")
+        if (typeof v1 === "number"
+            && typeof v2 === "number"
+            && typeof v3 === "number"
+            && (v4 === undefined || typeof v4 === "number"))
         {
             this.r = v1;
             this.g = v2;
@@ -35,7 +38,11 @@ export class Color
             this.b = Math.min(Math.max(0, v1), 1);
             this.a = 1;
         }
-        else if (v1 instanceof Array)
+        else if (v1 instanceof Array
+            && typeof v1[1] === "number"
+            && typeof v1[2] === "number"
+            && typeof v1[3] === "number"
+            && (v1[4] === undefined || typeof v1[4] === "number"))
         {
             this.r = v1[0];
             this.g = v1[1];
@@ -56,7 +63,6 @@ export class Color
                 this.b = Number.parseInt(match.groups.b1, 0x10) / 0xF;
                 this.a = match.groups.a1 === undefined ? 1 :
                     Number.parseInt(match.groups.a1, 0x10) / 0xF;
-                return;
             }
             else if (match.groups.r2 !== undefined)
             {
@@ -65,7 +71,6 @@ export class Color
                 this.b = Number.parseInt(match.groups.b2, 0x10) / 0xFF;
                 this.a = match.groups.a2 === undefined ? 1 :
                     Number.parseInt(match.groups.a2, 0x10) / 0xFF;
-                return;
             }
             else if (match.groups.r3 !== undefined)
             {
@@ -74,18 +79,46 @@ export class Color
                 this.b = Number.parseInt(match.groups.b3) / 0xFF;
                 this.a = match.groups.a3 === undefined ? 1 :
                     Number.parseFloat(match.groups.a3);
-                return;
             }
-
-            throw new SyntaxError(
-                `Could not convert string "${v1}" into Color.`);
+            else
+                throw new SyntaxError(
+                    `Could not convert string "${v1}" into Color.`);
         }
-        else
+        else if (typeof v1 === "object"
+            && v1 !== null
+            && "r" in v1
+            && typeof v1.r === "number"
+            && "g" in v1
+            && typeof v1.g === "number"
+            && "b" in v1
+            && typeof v1.b === "number")
         {
             this.r = v1.r;
             this.g = v1.g;
             this.b = v1.b;
-            this.a = v1.a ?? 1;
+
+            if ("a" in v1
+                && typeof v1.a === "number")
+                this.a = v1.a;
+            else
+                this.a = 1;
+        }
+        else
+            throw new Error(
+                `Could not convert value into Color.`);
+    }
+
+    public static from(r: number, g: number, b: number, a?: number): Color | undefined;
+    public static from(value: unknown): Color | undefined;
+    public static from(v1: any, v2?: any, v3?: any, v4?: any): Color | undefined
+    {
+        try
+        {
+            return new Color(v1, v2, v3, v4);
+        }
+        catch
+        {
+            return undefined;
         }
     }
 
