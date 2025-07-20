@@ -9,8 +9,7 @@ import { FlatList } from "react-native";
 
 export default function()
 {
-    const { date: [date, setDate] }
-        = useContext(CalenderStateContext)!;
+    const { date: [date, setDate] } = useContext(CalenderStateContext)!;
 
     const scrollView = useRef<FlatList<Date>>(undefined!);
 

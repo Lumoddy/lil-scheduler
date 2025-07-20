@@ -117,7 +117,11 @@ export function ThemedDropdown<T>(
         });
 
     return (
-        <View>
+        <View
+            style={
+            {
+                position: "relative",
+            }}>
             <ThemedButton
                 onPress={() =>
                 {
@@ -147,10 +151,12 @@ export function ThemedDropdown<T>(
                         padding: 0,
                         flexDirection: "column",
                         display: optionsShown ? "flex" : "none",
-                        position: "absolute",
+                        //position: "absolute", // I'm tired.
                         left: 0,
                         right: 0,
                         top: 0,
+                        zIndex: 100,
+                        elevation: 100,
                     },
                 ])}>
                 {processedOptions}

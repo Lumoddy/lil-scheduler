@@ -1,5 +1,6 @@
 import { Group } from "@/components/Flex";
 import { TaskListItem } from "@/components/TaskListItem";
+import { ThemedButton } from "@/components/ThemedButton";
 import { themedHeader } from "@/components/ThemedHeader";
 import { ThemeColors } from "@/constants/ThemeColors";
 import { FirebaseAuthContext, FirebaseFirestoreContext } from "@/contexts/Firebase";
@@ -8,8 +9,9 @@ import { NativeFirestore, WebFirestore } from "@/library/FirebaseMerge/Firestore
 import { over } from "@/library/IteratorExtensions";
 import { nativeOrWebMap } from "@/library/PlatformExtensions";
 import { TaskDefinition } from "@/library/Task";
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { useContext, useEffect } from "react";
+import { View } from "react-native";
 
 export default function()
 {
@@ -33,21 +35,24 @@ export default function()
                         if (firebaseAuth.currentUser === null)
                             return;
 
-                        const userDoc = await NativeFirestore.getDocFromServer(
-                            NativeFirestore.doc(
-                                firebaseFirestore,
-                                `/users/${firebaseAuth.currentUser.uid}`));
+                        const doc = NativeFirestore.doc(
+                            firebaseFirestore,
+                            `/users/${firebaseAuth.currentUser.uid}`);
+
+                        const userDoc = await NativeFirestore.getDoc(doc);
 
                         if (!userDoc.exists())
                         {
-                            userData.setTasks(undefined);
+                            await NativeFirestore.setDoc(doc, {});
+                            userData.setTasks([]);
+
                             return;
                         }
 
                         const userTasks = userDoc.get("tasks");
                         if (!(userTasks instanceof Array))
                         {
-                            userData.setTasks(undefined);
+                            userData.setTasks([]);
                             return;
                         }
 
@@ -64,21 +69,24 @@ export default function()
                         if (firebaseAuth.currentUser === null)
                             return;
 
-                        const userDoc = await WebFirestore.getDocFromServer(
-                            WebFirestore.doc(
-                                firebaseFirestore,
-                                `/users/${firebaseAuth.currentUser.uid}`));
+                        const doc = WebFirestore.doc(
+                            firebaseFirestore,
+                            `/users/${firebaseAuth.currentUser.uid}`);
+
+                        const userDoc = await WebFirestore.getDoc(doc);
 
                         if (!userDoc.exists())
                         {
-                            userData.setTasks(undefined);
+                            await WebFirestore.setDoc(doc, {});
+                            userData.setTasks([]);
+
                             return;
                         }
 
                         const userTasks = userDoc.get("tasks");
                         if (!(userTasks instanceof Array))
                         {
-                            userData.setTasks(undefined);
+                            userData.setTasks([]);
                             return;
                         }
 
@@ -94,6 +102,8 @@ export default function()
         },
         [userData === undefined, firebaseAuth, firebaseFirestore]);
 
+    const router = useRouter();
+
     return (
         <Group>
             <Stack.Screen options={
@@ -106,7 +116,27 @@ export default function()
                 title: "Tasks",
                 header: themedHeader(),
             }}/>
-            {userData?.tasks?.map((task, i) => <TaskListItem key={i} task={task}/>)}
+            <View
+                style={
+                {
+                    paddingInline: 24,
+                    gap: 8,
+                }}>
+                {userData?.tasks?.map((task, i) => <TaskListItem
+                    key={i}
+                    onPress={() =>
+                    {
+                        router.push(`/(tabs)/Tasks/TaskDetails?task-id=${i}`);
+                    }}
+                    task={task}/>)}
+                <ThemedButton
+                    onPress={() =>
+                    {
+                        router.push(`/(tabs)/Tasks/TaskDetails${""
+                            }?task-id=new`);
+                    }}
+                    children="New Task"/>
+            </View>
         </Group>
     );
 }

@@ -1,11 +1,11 @@
-import { Color, ColorHex } from "./Color";
+import { Color } from "./Color";
 import { over } from "./IteratorExtensions";
 
 export interface TaskDefinition
 {
     title: string,
     description: string,
-    color: ColorHex,
+    color: string,
     attributes: TaskAttribute[];
 }
 

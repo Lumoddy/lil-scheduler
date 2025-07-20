@@ -4,7 +4,9 @@ export type IterateOver<T, TReturn = any, TNext = any> =
     | Iterator<T, TReturn, TNext>
     | Iterator<T, TReturn, TNext>["next"];
 
-class _Iterator<T, TReturn, TNext> implements IteratorObject<T, TReturn, TNext>
+export class IteratorOver<T, TReturn = any, TNext = any>
+    implements IteratorObject<T, TReturn, TNext>,
+    Pick<Array<T>, "join" | "toSorted">
 {
     private readonly _from: Iterator<T, TReturn, TNext>;
 
@@ -16,11 +18,11 @@ class _Iterator<T, TReturn, TNext> implements IteratorObject<T, TReturn, TNext>
             from[Symbol.iterator]();
     }
 
-    map<U>(callbackfn: (value: T, index: number) => U)
-        : IteratorObject<U, undefined, unknown>
+    public map<U>(callbackfn: (value: T, index: number) => U)
+        : IteratorOver<U, undefined, unknown>
     {
         let i = -1;
-        return new _Iterator<U, undefined, unknown>((nextValue) =>
+        return new IteratorOver<U, undefined, unknown>((nextValue) =>
         {
             const { value, done } = this._from.next(nextValue as TNext);
 
@@ -31,13 +33,15 @@ class _Iterator<T, TReturn, TNext> implements IteratorObject<T, TReturn, TNext>
         });
     }
 
-    filter<S extends T>(predicate: (value: T, index: number) => value is S)
-        : IteratorObject<S, undefined, unknown>;
-    filter(predicate: (value: T, index: number) => unknown)
-        : IteratorObject<T, undefined, unknown>
+    public filter<S extends T>(predicate: (value: T, index: number) => value is S)
+        : IteratorOver<S, undefined, unknown>;
+    public filter(predicate: (value: T, index: number) => unknown)
+        : IteratorOver<T, undefined, unknown>;
+    public filter(predicate: (value: T, index: number) => unknown)
+        : IteratorOver<T, undefined, unknown>
     {
         let i = -1;
-        return new _Iterator<T, undefined, unknown>((next) =>
+        return new IteratorOver<T, undefined, unknown>((next) =>
         {
             while (true)
             {
@@ -52,9 +56,9 @@ class _Iterator<T, TReturn, TNext> implements IteratorObject<T, TReturn, TNext>
         });
     }
 
-    take(limit: number): IteratorObject<T, undefined, unknown>
+    public take(limit: number): IteratorOver<T, undefined, unknown>
     {
-        return new _Iterator<T, undefined, unknown>((next) =>
+        return new IteratorOver<T, undefined, unknown>((next) =>
         {
             if (limit > 0)
             {
@@ -72,9 +76,9 @@ class _Iterator<T, TReturn, TNext> implements IteratorObject<T, TReturn, TNext>
         });
     }
 
-    drop(count: number): IteratorObject<T, undefined, unknown>
+    public drop(count: number): IteratorOver<T, undefined, unknown>
     {
-        return new _Iterator<T, undefined, unknown>((next) =>
+        return new IteratorOver<T, undefined, unknown>((next) =>
         {
             while (count > 0)
             {
@@ -95,15 +99,15 @@ class _Iterator<T, TReturn, TNext> implements IteratorObject<T, TReturn, TNext>
         });
     }
 
-    flatMap<U>(
+    public flatMap<U>(
         callback: (value: T, index: number) =>
             IterateOver<U, unknown, undefined>)
-        : IteratorObject<U, undefined, unknown>
+        : IteratorOver<U, undefined, unknown>
     {
         let currentNext: Iterator<U, unknown, undefined>["next"] | undefined;
 
         let i = -1;
-        return new _Iterator<U, undefined, unknown>((next) =>
+        return new IteratorOver<U, undefined, unknown>((next) =>
         {
             while (true)
             {
@@ -129,19 +133,19 @@ class _Iterator<T, TReturn, TNext> implements IteratorObject<T, TReturn, TNext>
         });
     }
 
-    reduce(callbackfn: (
+    public reduce(callbackfn: (
         previousValue: T,
         currentValue: T,
         currentIndex: number) => T): T;
-    reduce(callbackfn: (
+    public reduce(callbackfn: (
         previousValue: T,
         currentValue: T,
         currentIndex: number) => T, initialValue: T): T;
-    reduce<U>(callbackfn: (
+    public reduce<U>(callbackfn: (
         previousValue: U,
         currentValue: T,
         currentIndex: number) => U, initialValue: U): U;
-    reduce<U>(callbackfn: (
+    public reduce<U>(callbackfn: (
         previousValue: U,
         currentValue: T,
         currentIndex: number) => U, initialValue?: U): U
@@ -162,7 +166,7 @@ class _Iterator<T, TReturn, TNext> implements IteratorObject<T, TReturn, TNext>
             }
 
             if (previousValue === undefined && currentIndex === 0)
-                previousValue = value as any as U; // T === U here.
+                previousValue = value! as U; // T === U here.
             else
                 previousValue = callbackfn(
                     previousValue as U,
@@ -171,57 +175,81 @@ class _Iterator<T, TReturn, TNext> implements IteratorObject<T, TReturn, TNext>
         }
     }
 
-    toArray(): T[] { return [...this as any] }
+    public toArray(): T[] { return [...this] }
 
-    forEach(callbackfn: (value: T, index: number) => void): void
+    public forEach(callbackfn: (value: T, index: number) => void, thisArg?: any): void
     {
         let i = -1;
-        for (const value of this as any)
-            callbackfn(value, ++i);
+        for (const value of this)
+            callbackfn.call(thisArg, value, ++i);
     }
 
-    some(predicate: (value: T, index: number) => unknown): boolean
+    public some(predicate: (value: T, index: number) => unknown, thisArg?: any): boolean
     {
         let i = -1;
-        for (const value of this as any)
-            if (predicate(value, ++i))
+        for (const value of this)
+            if (predicate.call(thisArg, value, ++i))
                 return true;
 
         return false;
     }
 
-    every(predicate: (value: T, index: number) => unknown): boolean
+    public every<S extends T>(predicate: (value: T, index: number) => value is S, thisArg?: any): this is IteratorOver<S, TReturn, TNext>;
+    public every(predicate: (value: T, index: number) => unknown, thisArg?: any): boolean;
+    public every(predicate: (value: T, index: number) => unknown, thisArg?: any): boolean
     {
         let i = -1;
-        for (const value of this as any)
-            if (!predicate(value, ++i))
+        for (const value of this)
+            if (!predicate.call(thisArg, value, ++i))
                 return false;
 
         return true;
     }
 
-    find<S extends T>(predicate: (value: T, index: number) => value is S): S | undefined;
-    find(predicate: (value: T, index: number) => unknown): T | undefined;
-    find(predicate: (value: T, index: number) => unknown): T | undefined
+    public find<S extends T>(predicate: (value: T, index: number) => value is S, thisArg?: any): S | undefined;
+    public find(predicate: (value: T, index: number) => unknown, thisArg?: any): T | undefined;
+    public find(predicate: (value: T, index: number) => unknown, thisArg?: any): T | undefined
     {
         let i = -1;
-        for (const value of this as any)
-            if (!predicate(value, ++i))
+        for (const value of this)
+            if (!predicate.call(thisArg, value, ++i))
                 return value;
 
         return undefined;
     }
 
-    [Symbol.iterator](): IteratorObject<T, TReturn, TNext> { return this }
-
-    get [Symbol.toStringTag](): string { return "IteratorObject" };
-
-    next(...[value]: [] | [TNext]): IteratorResult<T, TReturn>
+    public join(separator: string = ","): string
     {
-        return this._from.next(value as any);
+        let result = "";
+        let isFirst = true;
+        for (const value of this)
+        {
+            if (isFirst)
+                isFirst = false;
+            else
+                result += separator;
+
+            result += value;
+        }
+
+        return result;
     }
 
-    return(value?: TReturn | undefined): IteratorResult<T, TReturn>
+    public toSorted(compareFn?: (a: T, b: T) => number): T[]
+    {
+        return [...this].sort(compareFn);
+    }
+
+    public [Symbol.iterator](): this { return this }
+
+    public get [Symbol.toStringTag](): string { return "IteratorObject" };
+
+    public next(...[value]: [] | [TNext]): IteratorResult<T, TReturn>
+    {
+        return this._from.next(value as TNext);
+    }
+
+    public return(value?: TReturn | undefined): IteratorResult<T, TReturn>
     {
         if (this._from.return === undefined)
             return { value: undefined as TReturn, done: true };
@@ -229,7 +257,7 @@ class _Iterator<T, TReturn, TNext> implements IteratorObject<T, TReturn, TNext>
         return this._from.return(value);
     }
 
-    throw(e?: any): IteratorResult<T, TReturn>
+    public throw(e?: any): IteratorResult<T, TReturn>
     {
         if (this._from.throw === undefined)
             return { value: undefined as TReturn, done: true };
@@ -237,7 +265,7 @@ class _Iterator<T, TReturn, TNext> implements IteratorObject<T, TReturn, TNext>
         return this._from.throw(e);
     }
 
-    [Symbol.dispose](): void
+    public [Symbol.dispose](): void
     {
         if (!(Symbol.dispose in this._from))
             return;
@@ -248,27 +276,33 @@ class _Iterator<T, TReturn, TNext> implements IteratorObject<T, TReturn, TNext>
     }
 }
 
-export function over<T, TReturn = any, TNext = any>(
+export function over<T, TReturn = undefined, TNext = unknown>(
     collection:
         | Iterable<T, TReturn, TNext>
         | Iterator<T, TReturn, TNext>
-        | Iterator<T, TReturn, TNext>["next"])
-    : IteratorObject<T, TReturn, TNext>
+        | Iterator<T, TReturn, TNext>["next"]
+        | null
+        | undefined)
+    : IteratorOver<T, TReturn, TNext>
 {
+    if (collection === null
+        || collection === undefined)
+        return new IteratorOver([]) as any;
+
     const iterator =
         "next" in collection ? collection :
         collection instanceof Function ? { next: collection } :
         collection[Symbol.iterator]();
 
-    return new _Iterator(iterator);
+    return new IteratorOver(iterator);
 }
 
 export function range(to: number)
-    : IteratorObject<number, undefined, unknown>;
+    : IteratorOver<number, undefined, unknown>;
 export function range(from: number, to: number, step?: number)
-    : IteratorObject<number, undefined, unknown>;
+    : IteratorOver<number, undefined, unknown>;
 export function range(v1: number, v2?: number, v3?: number)
-    : IteratorObject<number, undefined, unknown>
+    : IteratorOver<number, undefined, unknown>
 {
     if (v2 === undefined)
     {
@@ -278,11 +312,14 @@ export function range(v1: number, v2?: number, v3?: number)
 
     v3 ??= 1;
 
-    return function*()
+    return over<number, undefined, unknown>(() =>
     {
-        for (let i = v1; i < v2; i += v3)
-            yield i;
+        if (v1 < v2)
+            return { value: undefined, done: true };
 
-        return undefined;
-    }()
+        const value = v1;
+        v1 += v3;
+
+        return { value, done: false };
+    });
 }

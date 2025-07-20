@@ -69,7 +69,7 @@ export function TaskListItem(
                                 text = `- ${attribute.date.toLocaleDateString()}`;
                                 break;
                             case "priority":
-                                text = `- ${["Low", "High", "Highest"][attribute.priority]}`;
+                                text = `- ${["Low", "High", "Highest"][attribute.priority]} Priority`;
                                 break;
                         }
 

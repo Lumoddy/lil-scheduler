@@ -51,7 +51,7 @@ export function themedHeader(props?: { lockUI: boolean })
                 (props.options.headerTitle ?? props.options.title) === "$logo-faded-text"
                     ? <ThemedLogo type="faded-text"/> :
                 props.options.headerTitle instanceof Function
-                    ? props.options.headerTitle({ children: props.route.name }) :
+                    ? props.options.headerTitle({ children: props.options.title ?? props.route.name }) :
                 <ThemedText
                     type={props.options.headerLargeTitle
                         ? "header1"
@@ -77,9 +77,12 @@ export function themedHeader(props?: { lockUI: boolean })
                             || props.back.href === undefined
                             ? undefined
                             : <ThemedLink
+                                style="textonly"
+                                color="bold"
+                                size="small"
                                 disabled={lockUI}
-                                href={props.back.href as Href}
-                                children={props.back.title ?? "Back"}/>
+                                dismissTo href={props.back.href as Href}
+                                children={props.options.headerBackTitle ?? props.back.title ?? "Back"}/>
                 }
                 <Expand/>
                 {
